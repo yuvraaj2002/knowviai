@@ -1,0 +1,11 @@
+[project]
+name = "knowviaai"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=6.29.5",
+    "llama-cloud-services>=0.6.33",
+    "pydantic-settings>=2.9.1",
+]
