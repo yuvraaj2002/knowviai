@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Chat Room</title>
+    <style>
+        #chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: 20%;
+        }
+
+        .bot-message {
+            background-color: #f5f5f5;
+            margin-right: 20%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-messages"></div>
+    <input type="text" id="chat-message-input" placeholder="Type your message...">
+    <button id="chat-message-submit">Send</button>
+
+    <script>
+        const roomName = 'lobby';
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+        );
+
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('chat-message-input');
+        const submitButton = document.getElementById('chat-message-submit');
+
+        chatSocket.onmessage = function (e) {
+            const data = JSON.parse(e.data);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot-message';
+            messageDiv.textContent = data.message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        submitButton.onclick = function (e) {
+            const message = messageInput.value;
+            if (message) {
+                chatSocket.send(JSON.stringify({
+                    'message': message
+                }));
+
+                // Add user message to chat
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message user-message';
+                messageDiv.textContent = message;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                messageInput.value = '';
+            }
+        };
+
+        messageInput.onkeypress = function (e) {
+            if (e.key === 'Enter') {
+                submitButton.click();
+            }
+        };
+    </script>
+</body>
+
+</html>
